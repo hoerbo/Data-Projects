@@ -8,3 +8,4 @@ List of projects:
 
 - Project #2: Identifying Factors for Viral Posts on the Hacker News Website
 - Project #3: Exploring eBay Kleinanzeigen Car Sales Data
+- Project #4: Finding Heavy Traffic Indicators on I-94
