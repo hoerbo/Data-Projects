@@ -1,0 +1,578 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "commercial-albuquerque",
+   "metadata": {},
+   "source": [
+    "# Identifying Factors for Viral Posts on the Hacker News Website\n",
+    "\n",
+    "This project analyzes posts on the *Hacker News* website based on their relevance (upvotes, comments).\n",
+    "Many posts are uploaded either in the *ASK HN (Hacker News)* or *Show HN* categories.\n",
+    "First these two categories are evaluated by their relevance and then the most promising posting time for the favorable category is identified.\n",
+    "\n",
+    "The data set can be downloaded [here](https://www.kaggle.com/hacker-news/hacker-news-posts) (external link to kaggle)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "confirmed-donna",
+   "metadata": {},
+   "source": [
+    "#### Summary of Results\n",
+    "\n",
+    "The most relevant posts were uploaded in the *Ask HN* category at 15:00 US Eastern Time."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "younger-conditions",
+   "metadata": {},
+   "source": [
+    "### Cleaning and sorting the data set"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "emotional-colorado",
+   "metadata": {},
+   "source": [
+    "First the data set is read in and saved in a `list of lists`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "mathematical-rally",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from csv import reader\n",
+    "\n",
+    "opened_file = open(\"HN.csv\")\n",
+    "read_file = reader(opened_file)\n",
+    "hn = list(read_file)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "banned-estate",
+   "metadata": {},
+   "source": [
+    "The header is assigned to the variable `headers`, removed from the data set and printed.\n",
+    "The first five rows of the data set are printed as well:\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "healthy-catalyst",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['id', 'title', 'url', 'num_points', 'num_comments', 'author', 'created_at']\n",
+      "\n",
+      "\n",
+      "['12579008', 'You have two days to comment if you want stem cells to be classified as your own', 'http://www.regulations.gov/document?D=FDA-2015-D-3719-0018', '1', '0', 'altstar', '9/26/2016 3:26']\n",
+      "\n",
+      "\n",
+      "['12579005', 'SQLAR  the SQLite Archiver', 'https://www.sqlite.org/sqlar/doc/trunk/README.md', '1', '0', 'blacksqr', '9/26/2016 3:24']\n",
+      "\n",
+      "\n",
+      "['12578997', 'What if we just printed a flatscreen television on the side of our boxes?', 'https://medium.com/vanmoof/our-secrets-out-f21c1f03fdc8#.ietxmez43', '1', '0', 'pavel_lishin', '9/26/2016 3:19']\n",
+      "\n",
+      "\n",
+      "['12578989', 'algorithmic music', 'http://cacm.acm.org/magazines/2011/7/109891-algorithmic-composition/fulltext', '1', '0', 'poindontcare', '9/26/2016 3:16']\n",
+      "\n",
+      "\n",
+      "['12578979', 'How the Data Vault Enables the Next-Gen Data Warehouse and Data Lake', 'https://www.talend.com/blog/2016/05/12/talend-and-Â\\x93the-data-vaultÂ\\x94', '1', '0', 'markgainor1', '9/26/2016 3:14']\n",
+      "\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "headers = hn[0]\n",
+    "print(headers)\n",
+    "print(\"\\n\")\n",
+    "\n",
+    "hn = hn[1:]\n",
+    "\n",
+    "for i, row in enumerate(hn):\n",
+    "    if i <5:\n",
+    "        print(row)\n",
+    "        print(\"\\n\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "viral-episode",
+   "metadata": {},
+   "source": [
+    "The data can be described as follows:\n",
+    "- id: a unique id\n",
+    "- title: the post's title\n",
+    "- url: if the post contains a url it is put in this row\n",
+    "- num_points: number of upvotes subtracted by the number of downvotes (popularity of the post)\n",
+    "- num_comments: number of comments about the post\n",
+    "- author: the post's author's nickname\n",
+    "- created_at: the time of creation\n",
+    "\n",
+    "Data entries with no comments (index=4) are not of interest and will be removed:\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "according-advantage",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "212718\n"
+     ]
+    }
+   ],
+   "source": [
+    "hn_cleaner = []\n",
+    "\n",
+    "for row in hn:\n",
+    "    num_comments = int(row[4])\n",
+    "    if num_comments != 0:\n",
+    "        hn_cleaner.append(row)\n",
+    "        \n",
+    "#print the number of removed posts:        \n",
+    "delta = len(hn) - len(hn_cleaner)\n",
+    "print(delta)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "another-craft",
+   "metadata": {},
+   "source": [
+    "Furthermore, only the *Ask HN* and *Show HN* posts are of interest in the analysis. So two new `lists` are created by filtering for these two categories:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "superior-paste",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "6911\n",
+      "['12578908', 'Ask HN: What TLD do you use for local development?', '', '4', '7', 'Sevrene', '9/26/2016 2:53']\n",
+      "\n",
+      "\n",
+      "['12578522', 'Ask HN: How do you pass on your work when you die?', '', '6', '3', 'PascLeRasc', '9/26/2016 1:17']\n",
+      "\n",
+      "\n",
+      "['12577870', 'Ask HN: Why join a fund when you can be an angel?', '', '1', '3', 'anthony_james', '9/25/2016 22:48']\n",
+      "\n",
+      "\n",
+      "['12577647', 'Ask HN: Someone uses stock trading as passive income?', '', '5', '2', '00taffe', '9/25/2016 21:50']\n",
+      "\n",
+      "\n",
+      "['12576946', 'Ask HN: How hard would it be to make a cheap, hackable phone?', '', '2', '1', 'hkt', '9/25/2016 19:30']\n",
+      "\n",
+      "\n",
+      "5059\n",
+      "['12577142', 'Show HN: Jumble  Essays on the go #PaulInYourPocket', 'https://itunes.apple.com/us/app/jumble-find-startup-essay/id1150939197?ls=1&mt=8', '1', '1', 'ryderj', '9/25/2016 20:06']\n",
+      "\n",
+      "\n",
+      "['12576813', 'Show HN: Learn Japanese Vocab via multiple choice questions', 'http://japanese.vul.io/', '1', '1', 'soulchild37', '9/25/2016 19:06']\n",
+      "\n",
+      "\n",
+      "['12576090', 'Show HN: Markov chain Twitter bot. Trained on comments left on Pornhub', 'https://twitter.com/botsonasty', '3', '1', 'keepingscore', '9/25/2016 16:50']\n",
+      "\n",
+      "\n",
+      "['12575471', 'Show HN: Project-Okot: Novel, CODE-FREE data-apps in mere seconds', 'https://studio.nuchwezi.com/', '3', '1', 'nfixx', '9/25/2016 14:30']\n",
+      "\n",
+      "\n",
+      "['12574773', 'Show HN: Cursor that Screenshot', 'http://edward.codes/cursor-that-screenshot', '3', '3', 'ed-bit', '9/25/2016 10:50']\n",
+      "\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "hn_ask = []\n",
+    "hn_show = []\n",
+    "other_posts = []\n",
+    "\n",
+    "for row in hn_cleaner:\n",
+    "    post_title = row[1]\n",
+    "    post_title = post_title.lower() #transform post title to lowercase\n",
+    "    if post_title.startswith('ask hn'):\n",
+    "        hn_ask.append(row)\n",
+    "    elif post_title.startswith('show hn'):\n",
+    "        hn_show.append(row)\n",
+    "    else:\n",
+    "        other_posts.append(row)\n",
+    "        \n",
+    "#print the number of posts in the Ask-category and the first five entries in the new list        \n",
+    "print(len(hn_ask))\n",
+    "for i, row in enumerate(hn_ask):\n",
+    "    if i <5:\n",
+    "        print(row)\n",
+    "        print(\"\\n\")\n",
+    "        \n",
+    "#do the same as above for the Show-category        \n",
+    "print(len(hn_show))\n",
+    "for i, row in enumerate(hn_show):\n",
+    "    if i <5:\n",
+    "        print(row)\n",
+    "        print(\"\\n\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "qualified-continuity",
+   "metadata": {},
+   "source": [
+    "As shown above, the data set is further decreased."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "demanding-dairy",
+   "metadata": {},
+   "source": [
+    "### Analyzing the data set"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "accredited-antigua",
+   "metadata": {},
+   "source": [
+    "Now it is analyzed if *Ask HN* oder *Show HN* has more comments on average:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "imported-summit",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "13.744175951381855\n",
+      "9.810832180272781\n",
+      "0.40091846428869515\n"
+     ]
+    }
+   ],
+   "source": [
+    "number_ask_comments = 0\n",
+    "number_show_comments = 0\n",
+    "\n",
+    "for row in hn_ask:\n",
+    "    num_comments = int(row[4])\n",
+    "    number_ask_comments += num_comments\n",
+    "\n",
+    "for row in hn_show:\n",
+    "    num_comments = int(row[4])\n",
+    "    number_show_comments += num_comments\n",
+    "    \n",
+    "avg_number_ask_comments = number_ask_comments / len(hn_ask)   \n",
+    "avg_number_show_comments = number_show_comments / len(hn_show)  \n",
+    "    \n",
+    "print(avg_number_ask_comments)\n",
+    "print(avg_number_show_comments)\n",
+    "\n",
+    "percentage = (avg_number_ask_comments - avg_number_show_comments) / avg_number_show_comments\n",
+    "print(percentage)\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "stone-absence",
+   "metadata": {},
+   "source": [
+    "It is shown, that the *Ask HN* posts get 40% more comments on average.\n",
+    "\n",
+    "In the following the analysis is focused on this category and it will be shown if posts created at a certain time attract more attention.\n",
+    "Consequently a `list` containing the time a post is uploaded accompanied by the number of comments is created:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "speaking-electronics",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[['9/26/2016 2:53', 7], ['9/26/2016 1:17', 3], ['9/25/2016 22:48', 3], ['9/25/2016 21:50', 2], ['9/25/2016 19:30', 1]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "result_list = []\n",
+    "for row in hn_ask:\n",
+    "    created_at = row[6]\n",
+    "    num_comments = int(row[4])\n",
+    "    result_list.append([created_at, num_comments])\n",
+    "\n",
+    "print(result_list[0:5])    "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "collected-apollo",
+   "metadata": {},
+   "source": [
+    "The date and time a post is created can be parsed with the `datetime` module.\n",
+    "Here only the posts per full hour should be analyzed.\n",
+    "So the *created_at* value is parsed by `datetime` and the hour is extracted:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "exclusive-active",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[2, 7], [1, 3], [22, 3], [21, 2], [19, 1]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "import datetime as dt\n",
+    "\n",
+    "for row in result_list:\n",
+    "    date_and_time = row[0]\n",
+    "    date_time = dt.datetime.strptime(date_and_time, \"%m/%d/%Y %H:%M\")\n",
+    "    row[0] = date_time.hour\n",
+    "    \n",
+    "print(result_list[0:5])    \n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "greatest-malta",
+   "metadata": {},
+   "source": [
+    "Now a `dictionary` is created showing the absolute number of comments per post and full hour. \n",
+    "Another `dictionary` counts the number of posts per hour:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "entire-context",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{2: 2996, 1: 2089, 22: 3372, 21: 4500, 19: 3954, 17: 5547, 15: 18525, 14: 4972, 13: 7245, 11: 2797, 10: 3013, 9: 1477, 7: 1585, 3: 2154, 16: 4466, 8: 2362, 0: 2277, 23: 2297, 20: 4462, 18: 4877, 12: 4234, 4: 2360, 6: 1587, 5: 1838}\n",
+      "{2: 227, 1: 223, 22: 287, 21: 407, 19: 420, 17: 404, 15: 467, 14: 378, 13: 326, 11: 251, 10: 219, 9: 176, 7: 157, 3: 212, 16: 415, 8: 190, 0: 231, 23: 276, 20: 392, 18: 452, 12: 274, 4: 186, 6: 176, 5: 165}\n"
+     ]
+    }
+   ],
+   "source": [
+    "results = {}\n",
+    "results_counter = {}\n",
+    "\n",
+    "for row in result_list:\n",
+    "    hour = row[0]\n",
+    "    num_comments = row[1]\n",
+    "    if hour in results:\n",
+    "        results[hour] += num_comments\n",
+    "        results_counter[hour] += 1\n",
+    "    else:\n",
+    "        results[hour] = num_comments\n",
+    "        results_counter[hour] = 1\n",
+    "        \n",
+    "print(results)\n",
+    "print(results_counter)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "characteristic-guinea",
+   "metadata": {},
+   "source": [
+    "These two `dictionaries` can be used to calculate the average number of comments per post and hour:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "endangered-palace",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "results_list_final = []\n",
+    "\n",
+    "for key in results:\n",
+    "    num_comments = results[key]\n",
+    "    num_posts = results_counter[key]\n",
+    "    average_number_comments = num_comments / num_posts\n",
+    "    average_number_comments = round(average_number_comments)\n",
+    "    results[key] = average_number_comments\n",
+    "    results_list_final.append([key, average_number_comments])   "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "brief-bulgaria",
+   "metadata": {},
+   "source": [
+    "To sort this `list` by decreasing values of average posts the order is swapped:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "wound-serial",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[40, 15], [22, 13], [15, 12], [14, 17], [14, 10], [13, 14], [13, 4], [13, 2], [12, 22], [12, 8], [11, 21], [11, 20], [11, 18], [11, 16], [11, 11], [11, 5], [10, 7], [10, 3], [10, 0], [9, 19], [9, 6], [9, 1], [8, 23], [8, 9]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "swapped_results_list_final = []\n",
+    "\n",
+    "for row in results_list_final:\n",
+    "    hour = row[0]\n",
+    "    avg_num_comments = row[1]\n",
+    "    swapped_results_list_final.append([avg_num_comments, hour])\n",
+    "\n",
+    "sorted_swap = sorted(swapped_results_list_final, reverse = True)   \n",
+    "print(sorted_swap)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "supported-wilderness",
+   "metadata": {},
+   "source": [
+    "The top five hours to post on Hacker News in the *Ask* category based on the number of comments a post attracted are:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "phantom-motivation",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "At 15:00 there were 40 comments for every post on average\n",
+      "At 13:00 there were 22 comments for every post on average\n",
+      "At 12:00 there were 15 comments for every post on average\n",
+      "At 17:00 there were 14 comments for every post on average\n",
+      "At 10:00 there were 14 comments for every post on average\n"
+     ]
+    }
+   ],
+   "source": [
+    "for i, row in enumerate(sorted_swap):\n",
+    "    hour = row[1]\n",
+    "    avg_num_comments = row[0]\n",
+    "    if i < 5:\n",
+    "        print(\"At {:02d}:00 there were {:02d} comments for every post on average\".format(hour, avg_num_comments))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "nutritional-plant",
+   "metadata": {},
+   "source": [
+    "According to the data set the time zone is Eastern Time in the US (UTC-4).\n",
+    "To convert the data to the summer time zone in Germany (UTC+2: where the author is living at the time of this work) a time delta of six hours has to be introduced.\n",
+    "Consequently the top five hours in german summer time are:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "instrumental-integrity",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "At 21:00 there were 40 comments for every post on average\n",
+      "At 19:00 there were 22 comments for every post on average\n",
+      "At 18:00 there were 15 comments for every post on average\n",
+      "At 23:00 there were 14 comments for every post on average\n",
+      "At 16:00 there were 14 comments for every post on average\n"
+     ]
+    }
+   ],
+   "source": [
+    "for i, row in enumerate(sorted_swap):\n",
+    "    hour = row[1] + 6\n",
+    "    avg_num_comments = row[0]\n",
+    "    if i < 5:\n",
+    "        print(\"At {:02d}:00 there were {:02d} comments for every post on average\".format(hour, avg_num_comments))"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.3"
+  },
+  "toc": {
+   "base_numbering": 1,
+   "nav_menu": {},
+   "number_sections": false,
+   "sideBar": true,
+   "skip_h1_title": true,
+   "title_cell": "Table of Contents",
+   "title_sidebar": "Contents",
+   "toc_cell": false,
+   "toc_position": {},
+   "toc_section_display": true,
+   "toc_window_display": false
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
