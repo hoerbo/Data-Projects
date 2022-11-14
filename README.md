@@ -10,3 +10,4 @@ List of projects:
 - Project 3: Exploring eBay Kleinanzeigen Car Sales Data
 - Project 4: Finding Heavy Traffic Indicators on I-94
 - Project 5: Data Visualization on Exchange Rates
+- Project 6: Analysis of Employee Exit Surveys
