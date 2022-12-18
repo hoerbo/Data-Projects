@@ -1,8 +1,8 @@
 # Repository for Data Science Projects
 
-This repository contains Data Science projects (influenced dataquest.io).
+This repository contains Data Science projects (influenced by dataquest.io).
 The projects are sorted into subfolders and consist of *jupyter notebooks* and data sets.
-The *.ipynb files are processed by github and can be viewed in the browser.
+The *.ipynb files can be viewed in the browser.
 
 List of projects:
 
