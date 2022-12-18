@@ -1,6 +1,6 @@
 # Repository for Data Science Projects
 
-This repository contains interesting projects from the **Data Scientist in Phython** course I am currently pursuing on dataquest.io.
+This repository contains Data Science projects (influenced dataquest.io).
 The projects are sorted into subfolders and consist of *jupyter notebooks* and data sets.
 The *.ipynb files are processed by github and can be viewed in the browser.
 
@@ -11,3 +11,4 @@ List of projects:
 - Project 4: Finding Heavy Traffic Indicators on I-94
 - Project 5: Data Visualization on Exchange Rates
 - Project 6: Analysis of Employee Exit Surveys
+- Project 7: Analyzing CIA Factbook Data Using SQL
