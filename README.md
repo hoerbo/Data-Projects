@@ -12,3 +12,4 @@ List of projects:
 - Project 5: Data Visualization on Exchange Rates
 - Project 6: Analysis of Employee Exit Surveys
 - Project 7: Analyzing CIA Factbook Data Using SQL
+- Project 8: Buildung a Spam Filter with Naive Bayes
