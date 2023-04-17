@@ -13,3 +13,4 @@ List of projects:
 - Project 6: Analysis of Employee Exit Surveys
 - Project 7: Analyzing CIA Factbook Data Using SQL
 - Project 8: Buildung a Spam Filter with Naive Bayes
+- Project 9: Predicting Heart Disease
