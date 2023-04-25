@@ -14,3 +14,4 @@ List of projects:
 - Project 7: Analyzing CIA Factbook Data Using SQL
 - Project 8: Buildung a Spam Filter with Naive Bayes
 - Project 9: Predicting Heart Disease
+- Project 10: Credit Card Customer Segmentation
