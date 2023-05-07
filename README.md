@@ -15,3 +15,4 @@ List of projects:
 - Project 8: Buildung a Spam Filter with Naive Bayes
 - Project 9: Predicting Heart Disease
 - Project 10: Credit Card Customer Segmentation
+- Project 11: Predicting Insurance Costs with Linear Regression
