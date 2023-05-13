@@ -14,4 +14,4 @@ List of projects:
 - [Project 9](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_09/Project_9.ipynb): Predicting Heart Disease
 - [Project 10](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_10/Project_10.ipynb): Credit Card Customer Segmentation
 - [Project 11](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_11/Project_11.ipynb): Predicting Insurance Costs with Linear Regression
-- [Project 12](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_12/Project_12.ipynb): Stochastic Gradient Descent on Linear Regression
+- [Project 12](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_12/Project_12.ipynb): Predicting Crowdedness at the Gym
