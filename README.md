@@ -1,6 +1,6 @@
 # Repository for Data Science Projects
 
-This repository contains projects I finished pursuing the `Data Scientist in Python` program by [dataquest](https://www.dataquest.io/path/data-scientist/)).
+This repository contains projects I finished pursuing the `Data Scientist in Python` program by [dataquest](https://www.dataquest.io/path/data-scientist/).
 
 List of projects:
 
