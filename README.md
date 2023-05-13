@@ -16,3 +16,4 @@ List of projects:
 - Project 9: Predicting Heart Disease
 - Project 10: Credit Card Customer Segmentation
 - Project 11: Predicting Insurance Costs with Linear Regression
+- Project 12: Stochastic Gradient Descent on Linear Regression
