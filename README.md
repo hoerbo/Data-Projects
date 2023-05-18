@@ -15,3 +15,4 @@ List of projects:
 - [Project 10](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_10/Project_10.ipynb): Credit Card Customer Segmentation
 - [Project 11](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_11/Project_11.ipynb): Predicting Insurance Costs with Linear Regression
 - [Project 12](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_12/Project_12.ipynb): Predicting Crowdedness at the Gym
+- [Project 13](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_13/Project_13.ipynb): Classifying Heart Disease with Logistic Regression
