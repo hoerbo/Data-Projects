@@ -10,7 +10,7 @@ List of projects:
 - [Project 4](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_04/Project_4.ipynb): Data Visualization on Exchange Rates
 - [Project 5](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_05/Project_5.ipynb): Analysis of Employee Exit Surveys
 - [Project 6](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_06/Project_6.ipynb): Analyzing CIA Factbook Data Using SQL
-- [Project 7](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_07/Project_7.ipynb): Buildung a Spam Filter with Naive Bayes
+- [Project 7](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_07/Project_7.ipynb): Building a Spam Filter with Naive Bayes
 - [Project 8](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_08/Project_8.ipynb): Predicting Heart Disease
 - [Project 9](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_09/Project_9.ipynb): Credit Card Customer Segmentation
 - [Project 10](https://github.com/hoerbo/Data-Science-Projects/blob/main/Project_10/Project_10.ipynb): Predicting Insurance Costs with Linear Regression
